@@ -2,7 +2,6 @@ from typing import Optional
 from pydantic import BaseModel, Field
 from bson import ObjectId
 
-
 class PyObjectId(ObjectId):
     @classmethod
     def __get_validators__(cls):
@@ -18,7 +17,7 @@ class Task(BaseModel):
     id: Optional[PyObjectId] = Field(alias='_id')
     title: str
     description: str
-    phone: int
+    phone: str
     completed: bool = False 
 
     class Config:
@@ -31,6 +30,7 @@ class Task(BaseModel):
 class UpdateTask(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
+    phone: Optional[str] = None
     completed: Optional[bool] = None
 
     class Config:

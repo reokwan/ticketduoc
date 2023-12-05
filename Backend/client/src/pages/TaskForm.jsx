@@ -1,41 +1,97 @@
 import { useState, useEffect } from "react";
-import { createTask, fetchTask, updateTask, deleteTask } from "../api/tasks";
+import { createTask, fetchTask, updateTask, deleteTask, fetchTasks} from "../api/tasks";
 import { useParams, useNavigate } from "react-router-dom";
 
 function TaskForm() {
   const [title, setTitle] = useState("");
+  const [phone, setPhone] = useState("");
   const [description, setDescription] = useState("");
 
   const params = useParams();
   const navigate = useNavigate();
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+    
+  //   try {
+  //     if (!params.id) {
+  //       const res = await createTask({ title, description, phone });
+
+  //       fetchTasks()
+  //         .then((res) => {
+  //           console.log(res)
+  //         })
+  //         .catch((error) => {
+  //           console.error(error);
+  //         });
+  //     } else {
+  //       const res = await updateTask(params.id, { title, description, phone });
+
+  //       fetchTasks()
+  //         .then((res) => {
+  //           console.log(res)
+  //         })
+  //         .catch((error) => {
+  //           console.error(error);
+  //         });
+  //     }
+  //     navigate("/");
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   e.target.reset();
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
+      let res;
       if (!params.id) {
-        const res = await createTask({ title, description });
-        console.log(res);
+        // Crear una nueva tarea
+        res = await createTask({ title, description, phone });
       } else {
-        const res = await updateTask(params.id, { title, description });
-        console.log(res);
+        // Actualizar una tarea existente
+        res = await updateTask(params.id, { title, description, phone });
       }
+  
+      // Realizar acciones después de la creación/actualización exitosa
+      console.log("Respuesta del servidor:", res);
+  
+      // Refetch tasks (si es necesario)
+      try {
+        const tasksResponse = await fetchTasks();
+        console.log("Tareas actualizadas:", tasksResponse);
+      } catch (fetchError) {
+        console.error("Error al obtener tareas:", fetchError);
+      }
+  
+      // Navegar a la página principal o a otra ruta según sea necesario
       navigate("/");
     } catch (error) {
-      console.error(error);
-      if (error.response?.data) {
-        alert(error.response.data.detail);
-      }
+      // Manejar errores en la creación/actualización de la tarea
+      console.error("Error en la creación/actualización de la tarea:", error);
+    } finally {
+      // Resetear el formulario en todos los casos
+      e.target.reset();
     }
-
-    e.target.reset();
   };
 
   useEffect(() => {
+    fetchTasks()
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
     if (params.id) {
       fetchTask(params.id)
         .then((res) => {
+          console.log(res)
           setTitle(res.data.title);
+          setPhone(res.data.phone)
           setDescription(res.data.description);
         })
         .catch((error) => {
@@ -48,16 +104,22 @@ function TaskForm() {
     <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
       <div>
         <form className="bg-zinc-950 p-10" onSubmit={handleSubmit}>
-          <h1 className="text-3xl font-bold my-4">Create Task</h1>
+          <h1 className="text-3xl font-bold my-4">Crear Task</h1>
+          <input
+            type="number"
+            placeholder="phone"
+            className="block p-2 py-2 px-3 mb-4 w-full text-black"
+            onChange={(e) => setPhone(e.target.value)}
+            value={phone}
+            autoFocus
+          />
           <input
             type="text"
             placeholder="title"
             className="block p-2 py-2 px-3 mb-4 w-full text-black"
             onChange={(e) => setTitle(e.target.value)}
             value={title}
-            autoFocus
-          />
-          <textarea
+          /><textarea
             placeholder="description"
             className="block p-2 py-2 px-3 mb-4 w-full text-black"
             onChange={(e) => setDescription(e.target.value)}
@@ -81,7 +143,7 @@ function TaskForm() {
               }
             }}
           >
-            Delete
+            Borrar
           </button>
         )}
       </div>

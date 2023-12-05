@@ -17,10 +17,10 @@ function HomePage() {
 
   return (
     <>
-      <h3 className="text-xl font-bold text-gray-400 mb-7">Pending Tasks</h3>
+      <h3 className="text-xl font-bold text-gray-400 mb-7"> Tasks Pendiente</h3>
       <TaskList tasks={pendingTasks} />
 
-      <h3 className="text-xl font-bold text-gray-400 mb-7">Completed Task</h3>
+      <h3 className="text-xl font-bold text-gray-400 mb-7">Task Completado</h3>
       <TaskList tasks={completedTasks} />
     </>
   );
